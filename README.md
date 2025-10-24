@@ -44,10 +44,10 @@ Put:
 <img width="1178" height="882" alt="postman_put" src="https://github.com/user-attachments/assets/e5c5be57-557f-48f7-8d32-bde60083e680" />
 
 Swagger interface: 
-<img width="1914" height="968" alt="image" src="https://github.com/user-attachments/assets/c29a5d0b-0989-42c0-85f6-5effeb6c0f19" />
+<img width="1896" height="968" alt="image" src="https://github.com/user-attachments/assets/203ab0a4-8201-4b3e-b5b1-2a090cea12ea" />
 
 
-<img width="1912" height="976" alt="swaggerr" src="https://github.com/user-attachments/assets/7aab232a-43eb-4d6c-b1ad-090a61f9ad1b" />
+<img width="1906" height="761" alt="image" src="https://github.com/user-attachments/assets/185274f6-f804-4cef-a201-629ab7ae3b80" />
 
 Swagger test:
 <img width="1892" height="972" alt="swagger1" src="https://github.com/user-attachments/assets/82b6e99d-f929-4fc1-9a86-7e8dd8722171" />
