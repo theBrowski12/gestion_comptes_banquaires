@@ -2,7 +2,6 @@ package cf.bankservice.web;
 
 import cf.bankservice.dto.RequestCompteDto;
 import cf.bankservice.dto.ResponseCompteDto;
-import cf.bankservice.entities.Compte;
 import cf.bankservice.serivce.CompteServiceImpl;
 import io.swagger.v3.oas.annotations.OpenAPIDefinition;
 import io.swagger.v3.oas.annotations.Operation;
@@ -19,19 +18,19 @@ import java.util.List;
 
 @OpenAPIDefinition(
         info = @Info(
-                title= "Gestion des comptes bancaire",
-                description= "offre tous les methodes pour gérer les comptes",
-                version= "1.0.0"
+                title = "Gestion des comptes bancaires",
+                description = "Offre toutes les méthodes pour gérer les comptes bancaires d’un client.",
+                version = "1.0.0"
         ),
-servers = @Server(
-        url = "http://localhost:8081/"
-)
-
+        servers = @Server(
+                url = "http://localhost:8081/"
+        )
 )
 @RestController
 @RequestMapping("/v1/comptes")
 public class ApiRestful {
-    private CompteServiceImpl compteService;
+
+    private final CompteServiceImpl compteService;
 
     public ApiRestful(CompteServiceImpl compteService) {
         this.compteService = compteService;
@@ -39,22 +38,20 @@ public class ApiRestful {
 
     @Operation(
             summary = "Ajouter un compte",
+            description = "Permet de créer un nouveau compte bancaire.",
             requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody(
                     required = true,
                     content = @Content(
                             mediaType = "application/json",
-                            schema = @Schema(implementation = ResponseCompteDto.class)
-
+                            schema = @Schema(implementation = RequestCompteDto.class)
                     )
             ),
             responses = {
-                    @ApiResponse(responseCode = "200", description ="bien enregistré",
-                    content = @Content(mediaType = "application/json",
-                            schema = @Schema(implementation = ResponseCompteDto.class))),
-                    @ApiResponse(responseCode = "4xx", description ="erruer cote client"),
-                    @ApiResponse(responseCode = "5xx", description ="erruer cote serveur"),
-
-
+                    @ApiResponse(responseCode = "200", description = "Compte enregistré avec succès",
+                            content = @Content(mediaType = "application/json",
+                                    schema = @Schema(implementation = ResponseCompteDto.class))),
+                    @ApiResponse(responseCode = "400", description = "Erreur côté client"),
+                    @ApiResponse(responseCode = "500", description = "Erreur côté serveur")
             }
     )
     @PostMapping
@@ -63,55 +60,127 @@ public class ApiRestful {
         return ResponseEntity.ok(responseCompteDto);
     }
 
-    @GetMapping
-    public ResponseEntity<List<ResponseCompteDto>> getAll() {
-        List<ResponseCompteDto> compteDtos= compteService.GetAllCompte();
-        return ResponseEntity.ok(compteDtos);
-    }
     @Operation(
-            summary = "recuperer un compte par son Id",
-            parameters = @Parameter(
-                    name = "id",
-                    required = true
-            ),
+            summary = "Afficher tous les comptes",
+            description = "Retourne la liste de tous les comptes enregistrés dans le système.",
             responses = {
-                    @ApiResponse(responseCode = "200",
-                            description = "bien récupérer",
-                            content = @Content(
-                                    mediaType = "application/json",
-                                    schema = @Schema(implementation = ResponseCompteDto.class))
-                    ),
-                    @ApiResponse(responseCode = "404",description = "compte pas trouvé ")
+                    @ApiResponse(responseCode = "200", description = "Liste des comptes récupérée avec succès",
+                            content = @Content(mediaType = "application/json",
+                                    schema = @Schema(implementation = ResponseCompteDto.class))),
+                    @ApiResponse(responseCode = "500", description = "Erreur côté serveur")
             }
     )
+    @GetMapping
+    public ResponseEntity<List<ResponseCompteDto>> getAll() {
+        List<ResponseCompteDto> compteDtos = compteService.GetAllCompte();
+        return ResponseEntity.ok(compteDtos);
+    }
 
+    @Operation(
+            summary = "Récupérer un compte par ID",
+            description = "Retourne les informations d’un compte spécifique selon son identifiant.",
+            parameters = {
+                    @Parameter(name = "id", description = "Identifiant du compte", required = true)
+            },
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "Compte récupéré avec succès",
+                            content = @Content(mediaType = "application/json",
+                                    schema = @Schema(implementation = ResponseCompteDto.class))),
+                    @ApiResponse(responseCode = "404", description = "Compte introuvable"),
+                    @ApiResponse(responseCode = "500", description = "Erreur côté serveur")
+            }
+    )
     @GetMapping("/{id}")
     public ResponseEntity<ResponseCompteDto> getById(@PathVariable int id) {
         ResponseCompteDto responseCompteDto = compteService.GetCompteById(id);
         return ResponseEntity.ok(responseCompteDto);
     }
 
+    @Operation(
+            summary = "Mettre à jour un compte",
+            description = "Modifie les informations d’un compte existant selon son identifiant.",
+            parameters = {
+                    @Parameter(name = "id", description = "Identifiant du compte à modifier", required = true)
+            },
+            requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody(
+                    required = true,
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = RequestCompteDto.class)
+                    )
+            ),
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "Compte mis à jour avec succès",
+                            content = @Content(mediaType = "application/json",
+                                    schema = @Schema(implementation = ResponseCompteDto.class))),
+                    @ApiResponse(responseCode = "404", description = "Compte introuvable"),
+                    @ApiResponse(responseCode = "500", description = "Erreur côté serveur")
+            }
+    )
     @PutMapping("/{id}")
     public ResponseEntity<ResponseCompteDto> update(@PathVariable int id, @RequestBody RequestCompteDto requestCompteDto) {
         ResponseCompteDto responseCompteDto = compteService.UpdateCompte(id, requestCompteDto);
         return ResponseEntity.ok(responseCompteDto);
     }
 
+    @Operation(
+            summary = "Supprimer un compte",
+            description = "Supprime un compte de la base de données selon son identifiant.",
+            parameters = {
+                    @Parameter(name = "id", description = "Identifiant du compte à supprimer", required = true)
+            },
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "Compte supprimé avec succès"),
+                    @ApiResponse(responseCode = "404", description = "Compte introuvable"),
+                    @ApiResponse(responseCode = "500", description = "Erreur côté serveur")
+            }
+    )
     @DeleteMapping("/{id}")
-    public ResponseEntity delete(@PathVariable Integer id) {
+    public ResponseEntity<Void> delete(@PathVariable Integer id) {
         compteService.DeleteCompteByID(id);
         return ResponseEntity.ok().build();
     }
 
+    @Operation(
+            summary = "Créditer un compte",
+            description = "Ajoute un montant au solde d’un compte.",
+            parameters = {
+                    @Parameter(name = "id", description = "Identifiant du compte", required = true),
+                    @Parameter(name = "montant", description = "Montant à créditer", required = true)
+            },
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "Compte crédité avec succès",
+                            content = @Content(mediaType = "application/json",
+                                    schema = @Schema(implementation = ResponseCompteDto.class))),
+                    @ApiResponse(responseCode = "404", description = "Compte introuvable"),
+                    @ApiResponse(responseCode = "500", description = "Erreur côté serveur")
+            }
+    )
     @PatchMapping("/crediter/{id}/{montant}")
-    ResponseEntity<ResponseCompteDto> crediter(@PathVariable int id, @PathVariable Double montant) {
-        ResponseCompteDto responseCompteDto= compteService.crediter(id, montant);
+    public ResponseEntity<ResponseCompteDto> crediter(@PathVariable int id, @PathVariable Double montant) {
+        ResponseCompteDto responseCompteDto = compteService.crediter(id, montant);
         return ResponseEntity.ok(responseCompteDto);
     }
 
+    @Operation(
+            summary = "Débiter un compte",
+            description = "Retire un montant du solde d’un compte.",
+            parameters = {
+                    @Parameter(name = "id", description = "Identifiant du compte", required = true),
+                    @Parameter(name = "montant", description = "Montant à débiter", required = true)
+            },
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "Compte débité avec succès",
+                            content = @Content(mediaType = "application/json",
+                                    schema = @Schema(implementation = ResponseCompteDto.class))),
+                    @ApiResponse(responseCode = "400", description = "Solde insuffisant"),
+                    @ApiResponse(responseCode = "404", description = "Compte introuvable"),
+                    @ApiResponse(responseCode = "500", description = "Erreur côté serveur")
+            }
+    )
     @PatchMapping("/debiter/{id}/{montant}")
-    ResponseEntity<ResponseCompteDto> debiter(@PathVariable int id, @PathVariable Double montant) {
-        ResponseCompteDto responseCompteDto= compteService.Debiter(id, montant);
+    public ResponseEntity<ResponseCompteDto> debiter(@PathVariable int id, @PathVariable Double montant) {
+        ResponseCompteDto responseCompteDto = compteService.Debiter(id, montant);
         return ResponseEntity.ok(responseCompteDto);
     }
 }
